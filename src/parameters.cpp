@@ -28,22 +28,28 @@ void Parameters::readFromfile(std::string filename)
     std::ifstream intrinsics_file;
     intrinsics_file.open(filename.c_str());
     std::string intrinsics_file_line;
-    for(size_t i=0; i<3; ++i)
+    for (size_t i = 0; i < 3; ++i)
     {
-        std::getline(intrinsics_file,intrinsics_file_line);
+        std::getline(intrinsics_file, intrinsics_file_line);
 
         std::stringstream str(intrinsics_file_line);
-        str >> K_cam(i,0) >> K_cam(i,1) >> K_cam(i,2);
+        str >> K_cam(i, 0) >> K_cam(i, 1) >> K_cam(i, 2);
     }
-     std::getline(intrinsics_file,intrinsics_file_line);
-     std::stringstream(intrinsics_file_line) >> output_size_x;
-     std::getline(intrinsics_file,intrinsics_file_line);
-     std::stringstream(intrinsics_file_line) >> output_size_y;
-     std::getline(intrinsics_file,intrinsics_file_line);
-     std::stringstream(intrinsics_file_line) >> radial;
-    intrinsics_file.close();
+    std::getline(intrinsics_file, intrinsics_file_line);
+    std::stringstream(intrinsics_file_line) >> output_size_x;
+    std::getline(intrinsics_file, intrinsics_file_line);
+    std::stringstream(intrinsics_file_line) >> output_size_y;
+    std::getline(intrinsics_file, intrinsics_file_line);
+    std::stringstream(intrinsics_file_line) >> radial;
 
     K_caminv = K_cam.inverse();
-    px = output_size_x/2.f;
-    py = output_size_y/2.f;
+    px = output_size_x / 2.f;
+    py = output_size_y / 2.f;
+
+    // yunfan
+    std::getline(intrinsics_file, intrinsics_file_line);
+    std::stringstream(intrinsics_file_line) >> camera_width;
+    std::getline(intrinsics_file, intrinsics_file_line);
+    std::stringstream(intrinsics_file_line) >> camera_height;
+    intrinsics_file.close();
 }

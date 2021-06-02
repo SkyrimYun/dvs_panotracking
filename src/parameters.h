@@ -36,6 +36,10 @@ public:
     float px;
     float py;
     float radial; // only distortion parameter
+
+    // yunfan
+    int camera_width;
+    int camera_height;
 };
 
 #endif // PARAMETERS_H

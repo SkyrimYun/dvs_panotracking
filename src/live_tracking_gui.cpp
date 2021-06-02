@@ -27,7 +27,7 @@
 #include "trackingmainwindow.h"
 #include "common.h"
 
-int main(int argc, char**argv)
+int main(int argc, char **argv)
 {
 
     int numDevices = 0;
@@ -42,15 +42,12 @@ int main(int argc, char**argv)
     }
 
     int deviceNumber = 0;
-//    if (numDevices > 1)
-//        deviceNumber = 1;
+    //    if (numDevices > 1)
+    //        deviceNumber = 1;
 
     QApplication app(argc, argv);
-    TrackingMainWindow window(argv[1],deviceNumber);
+    TrackingMainWindow window(argv[1], deviceNumber);
     window.show();
 
     return app.exec();
-
-
-
 }

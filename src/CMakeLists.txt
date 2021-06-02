@@ -61,7 +61,7 @@ SET ( GUI_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/dvscameraworker.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/trackingworker.cpp)
 
-link_directories(/usr/local/lib/x86_64-linux-gnu/) # libcaer
+link_directories(/usr/local/lib/) # libcaer
 link_directories(/usr/local/lib64/)
 CUDA_ADD_EXECUTABLE(live_tracking_gui ${GUI_FILES} ${HEADER_FILES} ${UI_RESOURCES})
 TARGET_LINK_LIBRARIES(live_tracking_gui dvs-tracking-common X11 Qt5::Widgets Qt5::OpenGL caer)
