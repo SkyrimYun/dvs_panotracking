@@ -183,8 +183,11 @@ void TrackingWorker::track(std::vector<Event> &events)
         time_track = timer.elapsed();
 
         // yunfan
-        static std::ofstream pose_output_(camera_parameters_.pose_output_dir + "/output_pose/estimated_pose.txt");
-        pose_output_ << packet_t_ << " " << pose_[1] << " " << pose_[0] << " " << pose_[2] << std::endl;
+        static std::ofstream pose_output_(camera_parameters_.pose_output_dir + "/output_pose/estimated_pose_rpg.txt");
+        float rad = pose_.norm();
+        Eigen::AngleAxisf aa(rad, pose_ / rad);
+        Eigen::Quaternionf q_eigen(aa);
+        pose_output_ << packet_t_ << " 0 0 0 " << pose_[1] << " " << q_eigen.x() << " " << q_eigen.y() << " " << q_eigen.z() << " " << q_eigen.w() << std::endl;
 
         if (successfull && tracking_quality_ > 0.25f)
         { // first few events often contain only noise. Update map only when tracking is good (arbitrary th).
