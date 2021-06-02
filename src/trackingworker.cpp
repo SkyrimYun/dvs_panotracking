@@ -184,7 +184,7 @@ void TrackingWorker::track(std::vector<Event> &events)
 
         // yunfan
         static std::ofstream pose_output_(camera_parameters_.pose_output_dir + "/output_pose/estimated_pose.txt");
-        pose_output_ << packet_t_ << " " << pose_[1] << " " << pose_[2] << " " << pose_[0] << std::endl;
+        pose_output_ << packet_t_ << " " << pose_[1] << " " << pose_[0] << " " << pose_[2] << std::endl;
 
         if (successfull && tracking_quality_ > 0.25f)
         { // first few events often contain only noise. Update map only when tracking is good (arbitrary th).
