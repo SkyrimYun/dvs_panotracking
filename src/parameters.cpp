@@ -51,5 +51,7 @@ void Parameters::readFromfile(std::string filename)
     std::stringstream(intrinsics_file_line) >> camera_width;
     std::getline(intrinsics_file, intrinsics_file_line);
     std::stringstream(intrinsics_file_line) >> camera_height;
+    std::getline(intrinsics_file, intrinsics_file_line);
+    std::stringstream(intrinsics_file_line) >> pose_output_dir;
     intrinsics_file.close();
 }

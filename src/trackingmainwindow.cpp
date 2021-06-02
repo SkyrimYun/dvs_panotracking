@@ -56,6 +56,7 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     std::cout << "camera size: " << width << "*" << height << std::endl;
     std::cout << "mosaic size: " << parameters_.output_size_x << "*" << parameters_.output_size_y << std::endl;
     std::cout << "radial: " << parameters_.radial << std::endl;
+    std::cout << "output pose path: " << parameters_.pose_output_dir << std::endl;
 
     // declare the GUI window
     mdi_area_ = new QMdiArea(this);

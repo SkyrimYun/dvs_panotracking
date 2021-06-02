@@ -40,6 +40,7 @@ public:
     // yunfan
     int camera_width;
     int camera_height;
+    std::string pose_output_dir;
 };
 
 #endif // PARAMETERS_H

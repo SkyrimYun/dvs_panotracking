@@ -36,7 +36,7 @@ void saveEvents(std::string filename, std::vector<Event> &events)
     file.close();
 }
 
-bool undistortPoint(Event &event, const Matrix3fr &K, float radial)
+bool undistortPoint(Event &event, const Matrix3fr &K, float radial, int camera_width, int camera_height)
 {
     float ccx = K(0, 2) - 1;
     float ccy = K(1, 2) - 1;
@@ -53,7 +53,7 @@ bool undistortPoint(Event &event, const Matrix3fr &K, float radial)
     event.x_undist = ux / rdist * fc + ccx;
     event.y_undist = uy / rdist * fc + ccy;
     // yunfan; add support to 240*180 camera
-    if (event.x_undist < 0 || event.x_undist > 127 || event.y_undist < 0 || event.y_undist > 127)
+    if (event.x_undist < 0 || event.x_undist > camera_width - 1 || event.y_undist < 0 || event.y_undist > camera_height - 1)
         return false;
     else
         return true;

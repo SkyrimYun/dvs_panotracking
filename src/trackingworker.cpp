@@ -170,8 +170,9 @@ void TrackingWorker::track(std::vector<Event> &events)
 
     for (int i = 0; i < events.size(); i++)
     {
-        ::undistortPoint(events[i], camera_parameters_.K_cam, camera_parameters_.radial);
-        *events_cpu_->data(i) = make_float2(events[i].x_undist, events[i].y_undist);
+        // yunfan
+        if (::undistortPoint(events[i], camera_parameters_.K_cam, camera_parameters_.radial, camera_parameters_.camera_width, camera_parameters_.camera_height))
+            *events_cpu_->data(i) = make_float2(events[i].x_undist, events[i].y_undist);
     }
     iu::copy(events_cpu_, events_gpu_);
 
@@ -182,7 +183,7 @@ void TrackingWorker::track(std::vector<Event> &events)
         time_track = timer.elapsed();
 
         // yunfan
-        static std::ofstream pose_output_("/home/yunfan/work_spaces/master_thesis/dvs-panotracking/data/esim/estimated_pose.txt");
+        static std::ofstream pose_output_(camera_parameters_.pose_output_dir + "/output_pose/estimated_pose.txt");
         pose_output_ << packet_t_ << " " << pose_[1] << " " << pose_[2] << " " << pose_[0] << std::endl;
 
         if (successfull && tracking_quality_ > 0.25f)
