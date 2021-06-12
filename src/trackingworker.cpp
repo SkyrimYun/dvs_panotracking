@@ -243,6 +243,8 @@ bool TrackingWorker::updatePose()
     points.topLeftCorner(events.rows(), events.cols()) = events;
     points.bottomRows<1>().setOnes();
     points = R_sphere_ * camera_parameters_.K_caminv * points;
+    // yunfan
+    //points = camera_parameters_.K_caminv * points;
 
     Eigen::Matrix3Xf X_hat(3, events.cols());
     Eigen::RowVectorXf X_hat_norm(events.cols());

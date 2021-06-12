@@ -42,7 +42,9 @@ void Parameters::readFromfile(std::string filename)
     std::getline(intrinsics_file, intrinsics_file_line);
     std::stringstream(intrinsics_file_line) >> radial;
 
+
     K_caminv = K_cam.inverse();
+    // center points
     px = output_size_x / 2.f;
     py = output_size_y / 2.f;
 
