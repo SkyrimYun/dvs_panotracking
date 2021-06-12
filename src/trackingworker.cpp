@@ -78,7 +78,6 @@ void TrackingWorker::addEvents(std::vector<Event> &events)
     if (all_events_.size() > 0)
     {
         all_events_.clear();
-        ;
     }
     QMutexLocker lock(&mutex_events_);
     for (int i = 0; i < events.size(); i++)
