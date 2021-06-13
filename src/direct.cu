@@ -120,25 +120,25 @@ inline __device__ __host__ float3 RotatePointSpherical(float3 pos, float3* rotat
 __device__ float2 ProjectMapSpherical(float3 pos)
 {
 
-    // float2 point;
-    // float el = pos.z/sqrt(pos.x*pos.x+pos.y*pos.y);
-    // float az = atan2(pos.y,pos.x);
+    float2 point;
+    float el = pos.z/sqrt(pos.x*pos.x+pos.y*pos.y);
+    float az = atan2(pos.y,pos.x);
 
-    // point.x = az/M_PI*const_pp.x*const_scale+const_pp.x;
-    // point.y = el*const_pp.y*const_scale/(const_pp.x/const_pp.y)+const_pp.y;
+    point.x = az/M_PI*const_pp.x*const_scale+const_pp.x;
+    point.y = el*const_pp.y*const_scale/(const_pp.x/const_pp.y)+const_pp.y;
 
-    // return point;
+    return point;
 
     // yunfan
-    float x = pos.x;
-    float y = pos.y;
-    float z = pos.z;
+    // float x = pos.x;
+    // float y = pos.y;
+    // float z = pos.z;
 
-    float rho = sqrt(x*x+y*y+z*z);
-    float2 pt_on_mosaic;
-    pt_on_mosaic.x = const_pp.x + const_Kcam[0].x*atan2(x,z);
-    pt_on_mosaic.y = const_pp.y + const_Kcam[1].y*asin(y / rho);
-    return pt_on_mosaic;
+    // float rho = sqrt(x*x+y*y+z*z);
+    // float2 pt_on_mosaic;
+    // pt_on_mosaic.x = const_pp.x + const_Kcam[0].x*atan2(x,z);
+    // pt_on_mosaic.y = const_pp.y + const_Kcam[1].y*asin(y / rho);
+    // return pt_on_mosaic;
 }
 
 

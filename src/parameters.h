@@ -23,6 +23,8 @@
 
 #include "common.h"
 
+
+
 class Parameters
 {
 public:
@@ -35,12 +37,14 @@ public:
     Matrix3fr K_cam;
     float px;
     float py;
-    float radial; // only distortion parameter
+
+
 
     // yunfan
     int camera_width;
     int camera_height;
     std::string pose_output_dir;
+    Distort distort;
 };
 
 #endif // PARAMETERS_H

@@ -26,12 +26,12 @@
 #include "iu/iumath.h"
 #include "eigenhelpers.h"
 
-TrackingWorker::TrackingWorker(const Parameters &cam_parameters, int width, int height, int device_number, float upscale)
+TrackingWorker::TrackingWorker(const Parameters &cam_parameters, int device_number, float upscale)
 {
     device_number_ = device_number;
     CudaSafeCall(cudaSetDevice(device_number_));
-    width_ = width;
-    height_ = height;
+    width_ = cam_parameters.camera_width;
+    height_ = cam_parameters.camera_height;
     output_ = new iu::ImageGpu_32f_C1(cam_parameters.output_size_x, cam_parameters.output_size_y);
     output_color_ = new iu::ImageGpu_8u_C4(cam_parameters.output_size_x, cam_parameters.output_size_y);
     occurences_ = new iu::ImageGpu_32f_C1(cam_parameters.output_size_x, cam_parameters.output_size_y);
@@ -71,6 +71,9 @@ TrackingWorker::TrackingWorker(const Parameters &cam_parameters, int width, int 
 
     show_camera_pose_ = true;
     show_events_ = true;
+
+    // yunfan
+    getUndistortMap();
 }
 
 void TrackingWorker::addEvents(std::vector<Event> &events)
@@ -170,7 +173,7 @@ void TrackingWorker::track(std::vector<Event> &events)
     for (int i = 0; i < events.size(); i++)
     {
         // yunfan
-        if (::undistortPoint(events[i], camera_parameters_.K_cam, camera_parameters_.radial, camera_parameters_.camera_width, camera_parameters_.camera_height))
+        if (::undistortPoint(events[i], undistorted, camera_parameters_.camera_width, camera_parameters_.camera_height))
             *events_cpu_->data(i) = make_float2(events[i].x_undist, events[i].y_undist);
     }
     iu::copy(events_cpu_, events_gpu_);
@@ -305,4 +308,40 @@ void TrackingWorker::clearEvents()
     QMutexLocker lock(&mutex_events_);
     std::queue<Event> empty;
     std::swap(events_, empty);
+}
+
+void TrackingWorker::getUndistortMap()
+{
+    undistorted = std::vector<int>(width_ * height_, -1);
+
+    float fx = camera_parameters_.K_cam(0, 0);
+    float fy = camera_parameters_.K_cam(1, 1);
+    float cx = camera_parameters_.K_cam(0, 2);
+    float cy = camera_parameters_.K_cam(1, 2);
+
+    float k1 = camera_parameters_.distort.k1;
+    float k2 = camera_parameters_.distort.k2;
+    float p1 = camera_parameters_.distort.p1;
+    float p2 = camera_parameters_.distort.p2;
+
+
+    for (int v = 0; v < height_; v++)
+    {
+        for (int u = 0; u < width_; u++)
+        {
+            float x = (u - cx) / fx, y = (v - cy) / fy;
+            float r = sqrt(x * x + y * y);
+            float x_distorted = x * (1 + k1 * r * r + k2 * r * r * r * r) + 2 * p1 * x * y + p2 * (r * r + 2 * x * x);
+            float y_distorted = y * (1 + k1 * r * r + k2 * r * r * r * r) + p1 * (r * r + 2 * y * y) + 2 * p2 * x * y;
+            float u_distorted = fx * x_distorted + cx;
+            float v_distorted = fy * y_distorted + cy;
+
+            int idx_distort = (int)v_distorted * width_ + (int)u_distorted;
+            int idx_undistort = (int)v * width_ + (int)u;
+            if (u_distorted >= 0 && v_distorted >= 0 && u_distorted < width_ && v_distorted < height_)
+            {
+                undistorted[idx_distort] = idx_undistort;
+            }
+        }
+    }
 }

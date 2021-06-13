@@ -49,13 +49,13 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     int width = parameters_.camera_width;
     int height = parameters_.camera_height;
 
-    tracking_worker_ = new TrackingWorker(parameters_, width, height, device_number, 1.0f);
+    tracking_worker_ = new TrackingWorker(parameters_, device_number, 1.0f);
     camera_worker_ = new DVSCameraWorker(tracking_worker_);
 
     std::cout << parameters_.K_cam << std::endl;
     std::cout << "camera size: " << width << "*" << height << std::endl;
     std::cout << "mosaic size: " << parameters_.output_size_x << "*" << parameters_.output_size_y << std::endl;
-    std::cout << "radial: " << parameters_.radial << std::endl;
+    std::cout << "radial: " << parameters_.distort.k1 << std::endl;
     std::cout << "output pose path: " << parameters_.pose_output_dir << std::endl;
 
     // declare the GUI window

@@ -28,14 +28,23 @@
 
 typedef Eigen::Matrix<float, 3, 3, Eigen::RowMajor> Matrix3fr;
 
+// yunfan
+struct Distort
+{
+    float k1;
+    float k2;
+    float p1;
+    float p2;
+};
+
 // IO functions
-void loadEvents(std::vector<Event> &events, const Matrix3fr &K, float radial, std::string filename);
+//void loadEvents(std::vector<Event> &events, const Matrix3fr &K, Distort distort, std::string filename);
 void loadEvents(std::vector<Event> &events, std::string filename);
 void saveEvents(std::string filename, std::vector<Event> &events);
 void saveState(std::string filename, const iu::ImageGpu_32f_C1 *mat, bool as_png, bool as_npy, bool as_exr);
 void saveState(std::string filename, const iu::ImageGpu_8u_C4 *mat);
 // helper function
-bool undistortPoint(Event &event, const Matrix3fr &K, float radial, int camera_width = 128, int camera_height = 128);
+bool undistortPoint(Event &event, const std::vector<int> &undistort, int camera_width = 128, int camera_height = 128);
 
 // Define this to turn on error checking
 #define CUDA_ERROR_CHECK

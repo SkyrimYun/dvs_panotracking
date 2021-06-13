@@ -40,8 +40,7 @@ void Parameters::readFromfile(std::string filename)
     std::getline(intrinsics_file, intrinsics_file_line);
     std::stringstream(intrinsics_file_line) >> output_size_y;
     std::getline(intrinsics_file, intrinsics_file_line);
-    std::stringstream(intrinsics_file_line) >> radial;
-
+    std::stringstream(intrinsics_file_line) >> distort.k1 >> distort.k2 >> distort.p1 >> distort.p2;
 
     K_caminv = K_cam.inverse();
     // center points

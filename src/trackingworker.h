@@ -33,7 +33,7 @@ class TrackingWorker : public QThread
     void run() Q_DECL_OVERRIDE;
 
 public:
-    TrackingWorker(const Parameters &cam_parameters, int width = 128, int height = 128, int device_number = 0, float upscale = 1.f);
+    TrackingWorker(const Parameters &cam_parameters, int device_number = 0, float upscale = 1.f);
     void addEvents(std::vector<Event> &events);
     void saveEvents(std::string filename);
     void saveCurrentState(std::string filename);
@@ -100,6 +100,8 @@ protected:
 
     //yunfan
     float packet_t_;
+    std::vector<int> undistorted;
+    void getUndistortMap();
 };
 
 #endif // DENOISINGWORKER_H

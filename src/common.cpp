@@ -36,60 +36,52 @@ void saveEvents(std::string filename, std::vector<Event> &events)
     file.close();
 }
 
-bool undistortPoint(Event &event, const Matrix3fr &K, float radial, int camera_width, int camera_height)
+bool undistortPoint(Event &event, const std::vector<int> &undistort, int camera_width, int camera_height)
 {
-    float ccx = K(0, 2) - 1;
-    float ccy = K(1, 2) - 1;
-    float fc = K(0, 0);
-
-    // normalize coordinate
-    float ux = (event.x - ccx) / fc;
-    float uy = (event.y - ccy) / fc;
-    float r2 = ux * ux + uy * uy;
-    float rdist = 1.f + radial * r2;
-    float rcomp = r2 / rdist;
-    rdist = 1.f + radial * rcomp;
-
-    event.x_undist = ux / rdist * fc + ccx;
-    event.y_undist = uy / rdist * fc + ccy;
-    // yunfan; add support to 240*180 camera
-    if (event.x_undist < 0 || event.x_undist > camera_width - 1 || event.y_undist < 0 || event.y_undist > camera_height - 1)
+    int idx = event.y * camera_width + event.x;
+    if(undistort[idx]==-1)
         return false;
     else
-        return true;
-}
-
-void loadEvents(std::vector<Event> &events, const Matrix3fr &K, float radial, std::string filename)
-{
-    std::ifstream ifs;
-    ifs.open(filename.c_str(), std::ifstream::in);
-    if (ifs.good())
     {
-        Event temp_event;
-        double time;
-        //        // throw away the first events
-        //        for(int i=0;i<100000;i++)
-        //        {
-        //            ifs >> time;
-        //            ifs >> temp_event.y;
-        //            ifs >> temp_event.x;
-        //            ifs >> temp_event.polarity;
-        //        }
-        while (!ifs.eof())
-        {
-            ifs >> temp_event.t;
-            ifs >> temp_event.x;
-            ifs >> temp_event.y;
-            ifs >> temp_event.polarity;
-
-            if (!undistortPoint(temp_event, K, radial)) // no points outside the original image
-                continue;
-
-            events.push_back(temp_event);
-        }
-        ifs.close();
+        int x = undistort[idx] % camera_width;
+        int y = undistort[idx] / camera_width;
+        event.x_undist = x;
+        event.y_undist = y;
+        return true;
     }
 }
+
+// void loadEvents(std::vector<Event> &events, const Matrix3fr &K, Distort distort, std::string filename)
+// {
+//     std::ifstream ifs;
+//     ifs.open(filename.c_str(), std::ifstream::in);
+//     if (ifs.good())
+//     {
+//         Event temp_event;
+//         double time;
+//         //        // throw away the first events
+//         //        for(int i=0;i<100000;i++)
+//         //        {
+//         //            ifs >> time;
+//         //            ifs >> temp_event.y;
+//         //            ifs >> temp_event.x;
+//         //            ifs >> temp_event.polarity;
+//         //        }
+//         while (!ifs.eof())
+//         {
+//             ifs >> temp_event.t;
+//             ifs >> temp_event.x;
+//             ifs >> temp_event.y;
+//             ifs >> temp_event.polarity;
+
+//             if (!undistortPoint(temp_event, K, distort)) // no points outside the original image
+//                 continue;
+
+//             events.push_back(temp_event);
+//         }
+//         ifs.close();
+//     }
+// }
 
 void loadEvents(std::vector<Event> &events, std::string filename)
 {
