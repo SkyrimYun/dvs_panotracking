@@ -100,8 +100,11 @@ void TrackingWorker::run()
     CudaSafeCall(cudaSetDevice(device_number_));
     iu::math::fill(*occurences_, 0);
     iu::math::fill(*normalization_, 1.f);
-    pose_.setZero();
-    old_pose_.setZero();
+    if(reset_pose_)
+    {
+        pose_.setZero();
+        old_pose_.setZero();
+    }
     all_events_.clear();
     running_ = true;
     tracking_quality_ = 1;
@@ -141,8 +144,11 @@ void TrackingWorker::stop()
     clearEvents();
     iu::math::fill(*occurences_, 0);
     iu::math::fill(*normalization_, 1.f);
-    pose_.setZero();
-    old_pose_.setZero();
+    if(reset_pose_)
+    {
+        pose_.setZero();
+        old_pose_.setZero();
+    }
     all_events_.clear();
     tracking_quality_ = 1;
     image_id_ = 0;
@@ -185,7 +191,7 @@ void TrackingWorker::track(std::vector<Event> &events)
         time_track = timer.elapsed();
 
         // yunfan
-        static std::ofstream pose_output_(camera_parameters_.pose_output_dir + "/output_pose/estimated_pose_rpg.txt");
+        static std::ofstream pose_output_(camera_parameters_.pose_output_dir + "/output_pose/estimated_pose_rpg.txt",std::ios::trunc);
         double rad = pose_.norm();
         Eigen::AngleAxisd aa(rad, Eigen::Vector3d(pose_[1], pose_[2], pose_[0]) / rad);
         Eigen::Quaterniond q_eigen(aa);

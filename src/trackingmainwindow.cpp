@@ -85,7 +85,7 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     spin_events_per_image_ = new QSpinBox;
     spin_events_per_image_->setMinimum(1);
     spin_events_per_image_->setMaximum(10000);
-    spin_events_per_image_->setValue(1500);
+    spin_events_per_image_->setValue(2000);
     spin_events_per_image_->setSingleStep(100);
     // Show every nth images
     spin_image_skip_ = new QSpinBox;
@@ -97,7 +97,7 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     spin_iterations_ = new QSpinBox;
     spin_iterations_->setMinimum(1);
     spin_iterations_->setMaximum(1000);
-    spin_iterations_->setValue(10);
+    spin_iterations_->setValue(20);
     spin_iterations_->setSingleStep(1);
     // Accel.Factor
     spin_acceleration_ = new QDoubleSpinBox;
@@ -112,6 +112,11 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     check_show_input_events_ = new QCheckBox("Show input events?");
     check_show_input_events_->setChecked(true);
     check_show_input_events_->setToolTip("Display the current events");
+    // yunfan
+    check_continus_tracking_ = new QCheckBox("continuous tracking between datasets?");
+    check_continus_tracking_->setChecked(false);
+    check_continus_tracking_->setToolTip("whether reset pose for new datasets");
+
     // operation bar at the very left side
     action_start_ = new QAction(QIcon(":play.png"), tr("&Start algorithm"), this);
     action_stop_ = new QAction(QIcon(":pause.png"), tr("S&top algorithm"), this);
@@ -138,7 +143,8 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     layout->addWidget(spin_acceleration_, 3, 1, 1, 1);
     layout->addWidget(check_show_camera_pose_, 4, 0, 1, 2);
     layout->addWidget(check_show_input_events_, 5, 0, 1, 2);
-    layout->addItem(space, 6, 0, -1, -1);
+    layout->addWidget(check_continus_tracking_, 6, 0, 1, 2);
+    layout->addItem(space, 7, 0, -1, -1);
 
     parameters->setLayout(layout);
     dock_->setWidget(parameters);
@@ -158,6 +164,7 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     connect(action_camera_, SIGNAL(triggered(bool)), this, SLOT(startCamera()));
     connect(check_show_camera_pose_, SIGNAL(clicked(bool)), tracking_worker_, SLOT(updateShowCameraPose(bool)));
     connect(check_show_input_events_, SIGNAL(clicked(bool)), tracking_worker_, SLOT(updateShowInputEvents(bool)));
+    connect(check_continus_tracking_, SIGNAL(clicked(bool)), tracking_worker_, SLOT(updateResetPose(bool)));
 
     // Menu Stuff
     action_open_ = new QAction(QIcon(":fileopenevents.png"), tr("&Load events from file"), this);

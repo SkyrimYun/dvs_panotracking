@@ -51,6 +51,7 @@ public slots:
     void updateImageSkip(int value) { image_skip_ = value; }
     void updateShowCameraPose(bool value) { show_camera_pose_ = value; }
     void updateShowInputEvents(bool value) { show_events_ = value; }
+    void updateResetPose(bool value) { reset_pose_ = !value; }
     void updateScale(float value);
     void updateAcceleration(double value) { alpha_ = value; }
 
@@ -68,6 +69,7 @@ protected:
 
     bool show_camera_pose_;
     bool show_events_;
+    bool reset_pose_;
     int device_number_;
     bool running_;
     int image_id_;
