@@ -23,6 +23,8 @@
 #include <QMutex>
 #include <Eigen/Dense>
 
+#include <time.h>
+
 #include "iu/iucore.h"
 #include "event.h"
 #include "parameters.h"
@@ -33,6 +35,9 @@ class TrackingWorker : public QThread
     void run() Q_DECL_OVERRIDE;
 
 public:
+    // yunfan
+    clock_t start_t, end_t;
+
     TrackingWorker(const Parameters &cam_parameters, int device_number = 0, float upscale = 1.f);
     void addEvents(std::vector<Event> &events);
     void saveEvents(std::string filename);
@@ -104,6 +109,8 @@ protected:
     float packet_t_;
     std::vector<int> undistorted;
     void getUndistortMap();
+
+    
 };
 
 #endif // DENOISINGWORKER_H

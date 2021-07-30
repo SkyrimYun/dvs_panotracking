@@ -98,10 +98,10 @@ void TrackingWorker::saveEvents(std::string filename)
 void TrackingWorker::run()
 {
     CudaSafeCall(cudaSetDevice(device_number_));
-    iu::math::fill(*occurences_, 0);
-    iu::math::fill(*normalization_, 1.f);
     if(reset_pose_)
     {
+        iu::math::fill(*occurences_, 0);
+        iu::math::fill(*normalization_, 1.f);
         pose_.setZero();
         old_pose_.setZero();
     }
@@ -142,10 +142,10 @@ void TrackingWorker::stop()
 {
     running_ = false;
     clearEvents();
-    iu::math::fill(*occurences_, 0);
-    iu::math::fill(*normalization_, 1.f);
     if(reset_pose_)
     {
+        iu::math::fill(*occurences_, 0);
+        iu::math::fill(*normalization_, 1.f);
         pose_.setZero();
         old_pose_.setZero();
     }
@@ -162,7 +162,9 @@ void TrackingWorker::updateScale(float value)
 
 void TrackingWorker::track(std::vector<Event> &events)
 {
-    iu::IuCudaTimer timer;
+    static iu::IuCudaTimer timer;
+    timer.start();
+
     double time_map;
     double time_track;
 
@@ -186,7 +188,7 @@ void TrackingWorker::track(std::vector<Event> &events)
 
     if (image_id_ > 10)
     { // First few poses are crap anyhow, since there is no map.
-        timer.start();
+        //timer.start();
         bool successfull = updatePose();
         time_track = timer.elapsed();
 
@@ -211,8 +213,10 @@ void TrackingWorker::track(std::vector<Event> &events)
     image_id_++;
     if (image_skip_ > 0 && (image_id_ % image_skip_) == 0)
     {
+        // yunfan
+        end_t = clock();
 
-        emit update_info(tr("Track: %1ms Map: %2ms. Quality: %3").arg(time_track).arg(time_map).arg(tracking_quality_), 0);
+        emit update_info(tr("Track: %1s Map: %2ms. Quality: %3").arg(double(end_t - start_t) / CLOCKS_PER_SEC).arg(time_map).arg(tracking_quality_), 0);
         cuda::createOutput(output_color_, output_, show_events_ ? events_gpu_ : NULL, make_float3(pose_(0), pose_(1), pose_(2)), width_, height_, show_camera_pose_ ? tracking_quality_ : -1.f);
         emit update_output(output_color_);
     }

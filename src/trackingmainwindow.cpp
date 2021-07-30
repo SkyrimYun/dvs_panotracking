@@ -31,6 +31,7 @@
 #include <fstream>
 #include "common.h"
 //#define DAVIS
+#include <fstream>
 
 TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int device_number) : QMainWindow(NULL)
 {
@@ -85,7 +86,7 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     spin_events_per_image_ = new QSpinBox;
     spin_events_per_image_->setMinimum(1);
     spin_events_per_image_->setMaximum(10000);
-    spin_events_per_image_->setValue(2000);
+    spin_events_per_image_->setValue(3000);
     spin_events_per_image_->setSingleStep(100);
     // Show every nth images
     spin_image_skip_ = new QSpinBox;
@@ -210,6 +211,10 @@ TrackingMainWindow::~TrackingMainWindow()
 
 void TrackingMainWindow::startTracking()
 {
+    // yunfan
+    tracking_worker_->start_t = clock();
+    std::ofstream reset_file("/home/yunfan/work_spaces/master_thesis/dvs-panotracking/data/cmp_datasets/shapes_rotation/output_poseestimated_pose_rpg.txt", std::ios::trunc);
+
     tracking_worker_->stop();
     if (events_.empty())
     { // start camera thread

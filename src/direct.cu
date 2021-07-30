@@ -124,8 +124,8 @@ __device__ float2 ProjectMapSpherical(float3 pos)
     // float el = pos.z/sqrt(pos.x*pos.x+pos.y*pos.y);
     // float az = atan2(pos.y,pos.x);
 
-    // point.x = az/M_PI*const_pp.x*const_scale+const_pp.x;
-    // point.y = el*const_pp.y*const_scale/(const_pp.x/const_pp.y)+const_pp.y;
+    // point.x = az/M_PI*const_pp.x*1.7+const_pp.x;
+    // point.y = el*const_pp.y*1.7/(const_pp.x/const_pp.y)+const_pp.y;
 
     // return point;
 
@@ -136,8 +136,8 @@ __device__ float2 ProjectMapSpherical(float3 pos)
 
     float rho = sqrt(x*x+y*y+z*z);
     float2 pt_on_mosaic;
-    pt_on_mosaic.x = const_pp.x+const_pp.x*atan2(y,x)/M_PI;
-    pt_on_mosaic.y = const_pp.y+(const_pp.y*2)*asin(z/rho)/M_PI;
+    pt_on_mosaic.x = const_pp.x + 1.5* const_pp.x * atan2(y,x)/M_PI;
+    pt_on_mosaic.y = const_pp.y + 1.5* (const_pp.y*2) * asin(z/rho)/M_PI;
     return pt_on_mosaic;
 
 }
