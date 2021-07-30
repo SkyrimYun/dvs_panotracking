@@ -136,8 +136,8 @@ __device__ float2 ProjectMapSpherical(float3 pos)
 
     float rho = sqrt(x*x+y*y+z*z);
     float2 pt_on_mosaic;
-    pt_on_mosaic.x = const_pp.x + 1.5* const_pp.x * atan2(y,x)/M_PI;
-    pt_on_mosaic.y = const_pp.y + 1.5* (const_pp.y*2) * asin(z/rho)/M_PI;
+    pt_on_mosaic.x = const_pp.x + const_scale * const_pp.x * atan2(y,x)/M_PI;
+    pt_on_mosaic.y = const_pp.y + const_scale * (const_pp.y*2) * asin(z/rho)/M_PI;
     return pt_on_mosaic;
 
 }
@@ -173,10 +173,12 @@ __global__ void updateNormalization_kernel(iu::ImageGpu_32f_C1::KernelData norma
             float2 p_m_old = ProjectMapSpherical(RotatePointSpherical(ProjectLine(make_float2(x,y)),R));
 
             // yunfan
-            // double l = length(p_m_old-p_m_curr);
-            // l = (-0.8*pose.z+1)*l;
+            double l = length(p_m_old-p_m_curr);
+            double offset = max(0.2, -0.5*pose.z+1);
+            l = offset*l;
+            normalization(curr_idx.x,curr_idx.y)+=l;
 
-            normalization(curr_idx.x,curr_idx.y)+=length(p_m_old-p_m_curr);
+            //normalization(curr_idx.x,curr_idx.y)+=length(p_m_old-p_m_curr);
         }
     }
 }
@@ -209,6 +211,7 @@ __global__ void getGradients_kernel(iu::LinearDeviceMemory_32f_C4::KernelData ou
 
 __global__ void createOutput1_kernel(iu::ImageGpu_8u_C4::KernelData output, iu::ImageGpu_32f_C1::KernelData map)
 {
+    // map location
     int x = blockIdx.x*blockDim.x + threadIdx.x;
     int y = blockIdx.y*blockDim.y + threadIdx.y;
 
@@ -221,6 +224,7 @@ __global__ void createOutput1_kernel(iu::ImageGpu_8u_C4::KernelData output, iu::
 
 __global__ void createOutput2_kernel(iu::ImageGpu_8u_C4::KernelData output, float3 pose, int cam_width, int cam_height, float quality)
 {
+    // camera pixel
     int x = blockIdx.x*blockDim.x + threadIdx.x;
     int y = blockIdx.y*blockDim.y + threadIdx.y;
 
@@ -328,19 +332,22 @@ void createOutput(iu::ImageGpu_8u_C4 *out, iu::ImageGpu_32f_C1 *map, iu::LinearD
     int nb_x = iu::divUp(out->width(),GPU_BLOCK_SIZE);
     int nb_y = iu::divUp(out->height(),GPU_BLOCK_SIZE);
 
-    dim3 dimBlock(GPU_BLOCK_SIZE,GPU_BLOCK_SIZE);
+    dim3 dimBlock(GPU_BLOCK_SIZE,GPU_BLOCK_SIZE); // 256
     dim3 dimGrid(nb_x,nb_y);
 
-    createOutput1_kernel<<<dimGrid,dimBlock>>>(*out,*map);
+    // generate map
+    createOutput1_kernel<<<dimGrid,dimBlock>>>(*out,*map); // total threads = map pixel number
 
     nb_x = iu::divUp(cam_width,GPU_BLOCK_SIZE);
     nb_y = iu::divUp(cam_height,GPU_BLOCK_SIZE);
 
-    dimBlock = dim3(GPU_BLOCK_SIZE,GPU_BLOCK_SIZE);
+    dimBlock = dim3(GPU_BLOCK_SIZE,GPU_BLOCK_SIZE); //256
     dimGrid = dim3(nb_x,nb_y);
     if(quality>0)
-        createOutput2_kernel<<<dimGrid,dimBlock>>>(*out,pose,cam_width,cam_height,min(quality,1.f));
+        // generate camera pose display
+        createOutput2_kernel<<<dimGrid,dimBlock>>>(*out,pose,cam_width,cam_height,min(quality,1.f)); // total threads = camera pixel number
 
+    // generate events display
     if(events) {
          nb_x = iu::divUp(events->numel(),GPU_BLOCK_SIZE);
          nb_y = 1;

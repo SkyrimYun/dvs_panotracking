@@ -117,6 +117,11 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     check_continus_tracking_ = new QCheckBox("continuous tracking between datasets?");
     check_continus_tracking_->setChecked(false);
     check_continus_tracking_->setToolTip("whether reset pose for new datasets");
+    upscale_ = new QDoubleSpinBox;
+    upscale_->setMinimum(1);
+    upscale_->setMaximum(2);
+    upscale_->setValue(1);
+    upscale_->setSingleStep(0.1);
 
     // operation bar at the very left side
     action_start_ = new QAction(QIcon(":play.png"), tr("&Start algorithm"), this);
@@ -133,6 +138,8 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     QLabel *label_events_per_image = new QLabel("Events/image:");
     spin_events_per_image_->setToolTip("Accumulate x events before reconstructing an image");
     QSpacerItem *space = new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+    QLabel *label_upscale = new QLabel("Upscale:");
+    upscale_->setToolTip("setting upscale factor; default 1");
 
     layout->addWidget(label_events_per_image, 0, 0, 1, 1);
     layout->addWidget(spin_events_per_image_, 0, 1, 1, 1);
@@ -142,10 +149,12 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     layout->addWidget(spin_iterations_, 2, 1, 1, 1);
     layout->addWidget(label_acceleration, 3, 0, 1, 1);
     layout->addWidget(spin_acceleration_, 3, 1, 1, 1);
-    layout->addWidget(check_show_camera_pose_, 4, 0, 1, 2);
-    layout->addWidget(check_show_input_events_, 5, 0, 1, 2);
-    layout->addWidget(check_continus_tracking_, 6, 0, 1, 2);
-    layout->addItem(space, 7, 0, -1, -1);
+    layout->addWidget(label_upscale, 4, 0, 1, 1);
+    layout->addWidget(upscale_, 4, 1, 1, 1);
+    layout->addWidget(check_show_camera_pose_, 5, 0, 1, 2);
+    layout->addWidget(check_show_input_events_, 6, 0, 1, 2);
+    layout->addWidget(check_continus_tracking_, 7, 0, 1, 2);
+    layout->addItem(space, 8, 0, -1, -1);
 
     parameters->setLayout(layout);
     dock_->setWidget(parameters);
@@ -158,6 +167,7 @@ TrackingMainWindow::TrackingMainWindow(char *camera_configuration_file, int devi
     connect(spin_image_skip_, SIGNAL(valueChanged(int)), tracking_worker_, SLOT(updateImageSkip(int)));
     connect(spin_iterations_, SIGNAL(valueChanged(int)), tracking_worker_, SLOT(updateIterations(int)));
     connect(spin_acceleration_, SIGNAL(valueChanged(double)), tracking_worker_, SLOT(updateAcceleration(double)));
+    connect(upscale_, SIGNAL(valueChanged(double)), tracking_worker_, SLOT(updateScale(double)));
     connect(tracking_worker_, SIGNAL(update_output(iu::ImageGpu_8u_C4 *)), output_win_, SLOT(update_image(iu::ImageGpu_8u_C4 *)));
     connect(tracking_worker_, SIGNAL(update_info(const QString &, int)), status_bar_, SLOT(showMessage(const QString &, int)));
     connect(action_start_, SIGNAL(triggered(bool)), this, SLOT(startTracking()));

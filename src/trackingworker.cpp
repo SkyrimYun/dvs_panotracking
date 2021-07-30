@@ -154,7 +154,7 @@ void TrackingWorker::stop()
     image_id_ = 0;
 }
 
-void TrackingWorker::updateScale(float value)
+void TrackingWorker::updateScale(double value)
 {
     upscale_ = value;
     cuda::setCameraMatrices(camera_parameters_.K_cam, camera_parameters_.K_caminv, camera_parameters_.px, camera_parameters_.py, upscale_);

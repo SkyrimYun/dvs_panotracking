@@ -76,6 +76,7 @@ class TrackingMainWindow : public QMainWindow
     QCheckBox *check_show_camera_pose_;
     QCheckBox *check_show_input_events_;
     QCheckBox *check_continus_tracking_;
+    QDoubleSpinBox *upscale_;
 
     QAction *action_start_;
     QAction *action_stop_;

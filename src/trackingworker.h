@@ -57,7 +57,7 @@ public slots:
     void updateShowCameraPose(bool value) { show_camera_pose_ = value; }
     void updateShowInputEvents(bool value) { show_events_ = value; }
     void updateResetPose(bool value) { reset_pose_ = !value; }
-    void updateScale(float value);
+    void updateScale(double value);
     void updateAcceleration(double value) { alpha_ = value; }
 
 protected:
