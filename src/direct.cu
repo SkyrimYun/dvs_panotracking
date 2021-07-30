@@ -171,6 +171,11 @@ __global__ void updateNormalization_kernel(iu::ImageGpu_32f_C1::KernelData norma
         if(curr_idx.x>=0){
             rodrigues(old_pose,R);
             float2 p_m_old = ProjectMapSpherical(RotatePointSpherical(ProjectLine(make_float2(x,y)),R));
+
+            // yunfan
+            // double l = length(p_m_old-p_m_curr);
+            // l = (-0.8*pose.z+1)*l;
+
             normalization(curr_idx.x,curr_idx.y)+=length(p_m_old-p_m_curr);
         }
     }
@@ -266,15 +271,17 @@ void setCameraMatrices(Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& Kcam, Eigen:
 
 void updateMap(iu::ImageGpu_32f_C1 *map, iu::ImageGpu_32f_C1 *occurences, iu::ImageGpu_32f_C1 *normalization, iu::LinearDeviceMemory_32f_C2 *events, float3 pose, float3 old_pose, int cam_width, int cam_height)
 {
-    int gpu_block_x = GPU_BLOCK_SIZE*GPU_BLOCK_SIZE;
+    // GPU_BLOCK_SIZE = 16
+
+    int gpu_block_x = GPU_BLOCK_SIZE*GPU_BLOCK_SIZE; //256
     int gpu_block_y = 1;
 
     // compute number of Blocks
     int nb_x = iu::divUp(events->numel(),gpu_block_x);
     int nb_y = 1;
 
-    dim3 dimBlock(gpu_block_x,gpu_block_y);
-    dim3 dimGrid(nb_x,nb_y);
+    dim3 dimBlock(gpu_block_x,gpu_block_y); // each block has 256 threads
+    dim3 dimGrid(nb_x,nb_y); // total threads number = events.size()
 
     updateOccurences_kernel<<<dimGrid,dimBlock>>>(*occurences,*events,pose);
     CudaCheckError();
@@ -286,8 +293,8 @@ void updateMap(iu::ImageGpu_32f_C1 *map, iu::ImageGpu_32f_C1 *occurences, iu::Im
     nb_x = iu::divUp(cam_width,gpu_block_x);
     nb_y = iu::divUp(cam_height,gpu_block_y);
 
-    dimBlock = dim3(gpu_block_x,gpu_block_y);
-    dimGrid = dim3(nb_x,nb_y);
+    dimBlock = dim3(gpu_block_x,gpu_block_y); // each block has 256 threads
+    dimGrid = dim3(nb_x,nb_y); // total threads number = camera pixel number
 
     updateNormalization_kernel<<<dimGrid,dimBlock>>>(*normalization,pose,old_pose,cam_width,cam_height);
     CudaCheckError();
@@ -295,8 +302,8 @@ void updateMap(iu::ImageGpu_32f_C1 *map, iu::ImageGpu_32f_C1 *occurences, iu::Im
     nb_x = iu::divUp(map->width(),gpu_block_x);
     nb_y = iu::divUp(map->height(),gpu_block_y);
 
-    dimBlock = dim3(gpu_block_x,gpu_block_y);
-    dimGrid = dim3(nb_x,nb_y);
+    dimBlock = dim3(gpu_block_x,gpu_block_y); // each block has 256 threads
+    dimGrid = dim3(nb_x,nb_y); // total threads number = map pixel number
 
     updateMap_kernel<<<dimGrid,dimBlock>>>(*map,*occurences,*normalization);
     CudaCheckError();
