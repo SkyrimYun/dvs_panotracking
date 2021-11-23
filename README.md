@@ -3,6 +3,7 @@
 
 ## Yunfan
 I modified this repository in order to match my need for the master thesis.
+Be careful that to compile this project, you need specific gcc and cuda version.
 The modifications are as below:
 - add support to 128*128 DVS camera
 - output estimation pose to txt file
