@@ -1,4 +1,20 @@
 # Real-Time Panoramic Tracking for Event Cameras
+
+
+## Yunfan
+I modified this repository in order to match my need for the master thesis.
+The modifications are as below:
+- add support to 128*128 DVS camera
+- output estimation pose to txt file
+  - format: time x y z q_x q_y q_z q_w
+- change its projection function; details about this change can be found in my thesis Section 4.2
+- update undistortion function to support more datasets
+- modify GUI to support continuous tracking between datasets 
+  - some datasets like poster_rotation is too large to load in one time. so I separate it into several smaller files and use this feature to get the result.
+- add timer to count the time consumption on each datasets
+- add upscale selection in GUI
+
+
 This repository provides software for our publication "Real-Time Panoramic Tracking for Event Cameras", ICCP 2017.
 
 If you use this code please cite the following publication (https://arxiv.org/abs/1703.05161):
